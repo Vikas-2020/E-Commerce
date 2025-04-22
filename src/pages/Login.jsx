@@ -56,7 +56,7 @@ const Login = () => {
       if (isLogin) {
         await signInWithEmailAndPassword(auth, email, password);
         alert("Login successful!");
-        navigate("/home");
+        navigate("/");
       } else {
         await createUserWithEmailAndPassword(auth, email, password);
         alert("Account created successfully!");
