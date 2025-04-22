@@ -1,86 +1,75 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { FaUserCircle, FaSignOutAlt } from 'react-icons/fa';
-import { FaEye, FaEyeSlash } from "react-icons/fa";
+import React, { useState, useEffect } from "react";
+import { useNavigate, Link } from "react-router-dom";
+import { FaUserCircle, FaSignOutAlt, FaEye, FaEyeSlash } from "react-icons/fa";
+import {
+  auth,
+  signInWithEmailAndPassword,
+  createUserWithEmailAndPassword,
+  onAuthStateChanged,
+  signOut,
+} from "../firebase";
 
 const Login = () => {
   const [isLogin, setIsLogin] = useState(true);
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPwd, setConfirmPwd] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPwd, setConfirmPwd] = useState("");
   const [showPwd, setShowPwd] = useState(false);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [loggedInUser, setLoggedInUser] = useState(null);
 
   const navigate = useNavigate();
 
   useEffect(() => {
-    const isAuthenticated = JSON.parse(localStorage.getItem('isAuthenticated'));
-    const userEmail = localStorage.getItem('loggedInUser');
-    if (isAuthenticated && userEmail) {
-      setIsLoggedIn(true);
-      setLoggedInUser(userEmail);
-    }
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (user) {
+        setIsLoggedIn(true);
+        setLoggedInUser(user.email);
+      } else {
+        setIsLoggedIn(false);
+        setLoggedInUser(null);
+      }
+    });
+
+    return () => unsubscribe();
   }, []);
 
-  const handleLogout = () => {
-    localStorage.removeItem('isAuthenticated');
-    localStorage.removeItem('loggedInUser');
-    setIsLoggedIn(false);
-    setLoggedInUser(null);
+  const handleLogout = async () => {
+    await signOut(auth);
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (!email || !password || (!isLogin && !confirmPwd)) {
-      setError('Please fill in all fields.');
+      setError("Please fill in all fields.");
       return;
     }
 
     if (!isLogin && password !== confirmPwd) {
-      setError('Passwords do not match.');
+      setError("Passwords do not match.");
       return;
     }
 
-    const users = JSON.parse(localStorage.getItem('users')) || [];
-
-    if (isLogin) {
-      const matchedUser = users.find(
-        (user) => user.email === email && user.password === password
-      );
-
-      if (!matchedUser) {
-        setError('Invalid email or password.');
-        return;
+    try {
+      if (isLogin) {
+        await signInWithEmailAndPassword(auth, email, password);
+        alert("Login successful!");
+        navigate("/home");
+      } else {
+        await createUserWithEmailAndPassword(auth, email, password);
+        alert("Account created successfully!");
+        setIsLogin(true);
       }
 
-      alert('Login successful!');
-      localStorage.setItem('isAuthenticated', true);
-      localStorage.setItem('loggedInUser', matchedUser.email);
-      setIsLoggedIn(true);
-      setLoggedInUser(matchedUser.email);
-      navigate('/home');
-    } else {
-      const emailExists = users.some((user) => user.email === email);
-
-      if (emailExists) {
-        setError('Email already registered.');
-        return;
-      }
-
-      const newUser = { email, password };
-      const updatedUsers = [...users, newUser];
-      localStorage.setItem('users', JSON.stringify(updatedUsers));
-      alert('Account created successfully!');
-      setIsLogin(true);
+      setEmail("");
+      setPassword("");
+      setConfirmPwd("");
+      setError("");
+    } catch (err) {
+      setError(err.message);
     }
-
-    setEmail('');
-    setPassword('');
-    setConfirmPwd('');
-    setError('');
   };
 
   if (isLoggedIn) {
@@ -92,13 +81,23 @@ const Login = () => {
             Welcome, <span className="text-blue-700">{loggedInUser}</span>
           </h2>
           <p className="text-gray-500 mb-4">You are logged in!</p>
-          <button
-            onClick={handleLogout}
-            className="inline-flex items-center gap-2 bg-red-500 text-white py-2 px-4 rounded-lg hover:bg-red-600 transition"
-          >
-            <FaSignOutAlt />
-            Logout
-          </button>
+
+          <div className="flex flex-col gap-4">
+            <button
+              onClick={() => navigate("/change-password")}
+              className="bg-yellow-500 text-white py-2 px-4 rounded-lg hover:bg-yellow-600 transition"
+            >
+              Change Password
+            </button>
+
+            <button
+              onClick={handleLogout}
+              className="inline-flex items-center justify-center gap-2 bg-red-500 text-white py-2 px-4 rounded-lg hover:bg-red-600 transition"
+            >
+              <FaSignOutAlt />
+              Logout
+            </button>
+          </div>
         </div>
       </div>
     );
@@ -108,7 +107,7 @@ const Login = () => {
     <div className="min-h-[72.7vh] flex items-center justify-center bg-white px-4">
       <div className="bg-white border border-gray-200 shadow-md rounded-2xl p-8 w-full max-w-md">
         <h2 className="text-2xl font-bold mb-6 text-center text-blue-700">
-          {isLogin ? 'Login' : 'Sign Up'}
+          {isLogin ? "Login" : "Sign Up"}
         </h2>
 
         <form onSubmit={handleSubmit} className="space-y-5">
@@ -127,7 +126,7 @@ const Login = () => {
             <label className="block mb-1 font-medium">Password</label>
             <div className="relative">
               <input
-                type={showPwd ? 'text' : 'password'}
+                type={showPwd ? "text" : "password"}
                 className="w-full px-4 py-2 border rounded-lg pr-10 focus:outline-none focus:ring-2 focus:ring-blue-400"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
@@ -146,7 +145,7 @@ const Login = () => {
             <div>
               <label className="block mb-1 font-medium">Confirm Password</label>
               <input
-                type={showPwd ? 'text' : 'password'}
+                type={showPwd ? "text" : "password"}
                 className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
                 value={confirmPwd}
                 onChange={(e) => setConfirmPwd(e.target.value)}
@@ -161,23 +160,31 @@ const Login = () => {
             type="submit"
             className="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition"
           >
-            {isLogin ? 'Login' : 'Sign Up'}
+            {isLogin ? "Login" : "Sign Up"}
           </button>
         </form>
 
+        {isLogin && (
+          <div className="text-right text-sm mt-2">
+            <Link to="/forgot-password" className="text-blue-600 hover:underline">
+              Forgot Password?
+            </Link>
+          </div>
+        )}
+
         <div className="text-center mt-4 text-sm">
-          {isLogin ? "Don't have an account?" : 'Already have an account?'}{' '}
+          {isLogin ? "Don't have an account?" : "Already have an account?"}{" "}
           <button
             className="text-blue-600 hover:underline font-medium"
             onClick={() => {
               setIsLogin(!isLogin);
-              setError('');
-              setEmail('');
-              setPassword('');
-              setConfirmPwd('');
+              setError("");
+              setEmail("");
+              setPassword("");
+              setConfirmPwd("");
             }}
           >
-            {isLogin ? 'Sign Up' : 'Login'}
+            {isLogin ? "Sign Up" : "Login"}
           </button>
         </div>
       </div>

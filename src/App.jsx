@@ -10,6 +10,8 @@ import Login from "./pages/Login";
 import Notfound from "./pages/Notfound";
 import Singleproduct from "./pages/Singleproduct";
 import CartProvider from "./context/CartContext";
+import ForgotPassword from "./pages/ForgotPassword";
+import ChangePassword from "./pages/ChangePassword";
 
 const router = createBrowserRouter([
   {
@@ -47,6 +49,14 @@ const router = createBrowserRouter([
       {
         path: "/products/:id",
         element: <Singleproduct />,
+      },
+      {
+        path:"/forgot-password",
+        element: <ForgotPassword />
+      },
+      {
+        path:"/change-password",
+        element: <ChangePassword />
       },
       {
         path: "*",
