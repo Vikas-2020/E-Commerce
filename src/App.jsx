@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { RouterProvider, createBrowserRouter } from "react-router-dom";
 import First from "./pages/First";
 import Home from "./pages/Home";
@@ -63,12 +63,6 @@ const router = createBrowserRouter([
 ]);
 
 function App() {
-
-  useEffect(() => {
-    // Clear localStorage on full reload
-    localStorage.clear();
-  }, []);
-
   return (
     <CartProvider>
       <RouterProvider router={router} />
