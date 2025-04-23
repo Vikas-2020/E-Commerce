@@ -7,7 +7,7 @@ const Wishlist = () => {
   const { wishlist, removeFromWishlist, handleAddToCart } = useCart();
 
   return (
-    <div className="p-6 max-w-6xl mx-auto min-h-[73.9vh]">
+    <div className="p-6 max-w-6xl mx-auto min-h-[72.7vh]">
       <h2 className="text-3xl font-bold text-blue-700 mb-6 text-center">
         Your Wishlist ❤️
       </h2>

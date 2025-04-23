@@ -74,7 +74,7 @@ const Login = () => {
 
   if (isLoggedIn) {
     return (
-      <div className="min-h-[73.9vh] flex flex-col items-center justify-center bg-white px-4">
+      <div className="min-h-[72.7vh] flex flex-col items-center justify-center bg-white px-4">
         <div className="bg-white border border-gray-200 shadow-md rounded-2xl p-8 max-w-md w-full text-center">
           <FaUserCircle className="text-blue-600 text-5xl mx-auto mb-4" />
           <h2 className="text-xl font-semibold mb-2 text-gray-700">
