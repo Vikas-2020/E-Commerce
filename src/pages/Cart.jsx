@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import { useCart } from "../context/CartContext";
 import { MdDelete } from "react-icons/md";
 
@@ -11,10 +12,22 @@ function Cart() {
 
   return (
     <div className="p-6 max-w-5xl mx-auto min-h-[73.9vh]">
-      <h2 className="text-3xl font-bold mb-6 text-center">🛒 Your Shopping Cart</h2>
+      <h2 className="text-3xl font-bold mb-6 text-center">
+        🛒 Your Shopping Cart
+      </h2>
 
       {cart.length === 0 ? (
-        <p className="text-gray-500 text-center">Your cart is currently empty.</p>
+        <>
+          <p className="text-gray-500 text-center">
+            Your cart is currently empty.
+          </p>
+          <Link
+            to="/"
+            className="text-blue-500 text-center block mt-2 hover:underline"
+          >
+            Explore Products
+          </Link>
+        </>
       ) : (
         <>
           <div className="space-y-6">
@@ -32,7 +45,9 @@ function Cart() {
                   />
                   <div>
                     <h4 className="text-lg font-semibold">{item.name}</h4>
-                    <p className="text-sm text-gray-600">Category: {item.category || "General"}</p>
+                    <p className="text-sm text-gray-600">
+                      Category: {item.category || "General"}
+                    </p>
                     <p className="text-sm text-gray-500 mt-1 line-clamp-2">
                       {item.description || "No description available."}
                     </p>
