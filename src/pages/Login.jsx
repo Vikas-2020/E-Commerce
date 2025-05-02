@@ -1,13 +1,13 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { FaUserCircle, FaSignOutAlt, FaEye, FaEyeSlash } from "react-icons/fa";
+import { FaEye, FaEyeSlash } from "react-icons/fa";
 import {
   auth,
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
-  onAuthStateChanged,
-  signOut,
 } from "../firebase";
+import { useAuth } from "../context/AuthContext";
+import Profile from "./Profile";
 
 const Login = () => {
   const [isLogin, setIsLogin] = useState(true);
@@ -16,28 +16,11 @@ const Login = () => {
   const [confirmPwd, setConfirmPwd] = useState("");
   const [showPwd, setShowPwd] = useState(false);
   const [error, setError] = useState("");
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [loggedInUser, setLoggedInUser] = useState(null);
-
   const navigate = useNavigate();
 
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      if (user) {
-        setIsLoggedIn(true);
-        setLoggedInUser(user.email);
-      } else {
-        setIsLoggedIn(false);
-        setLoggedInUser(null);
-      }
-    });
+  const {user} = useAuth();
+  const [showMessage, setShowMessage] = useState(false);
 
-    return () => unsubscribe();
-  }, []);
-
-  const handleLogout = async () => {
-    await signOut(auth);
-  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -72,34 +55,26 @@ const Login = () => {
     }
   };
 
-  if (isLoggedIn) {
+  useEffect(() => {
+    if (user) {
+      setShowMessage(true);
+
+      const timer = setTimeout(() => {
+        setShowMessage(false);
+        navigate("/profile");
+      }, 2000);
+
+      return () => clearTimeout(timer);
+    }
+  }, [user]);
+
+  if (user) {
     return (
-      <div className="min-h-[73.9vh] flex flex-col items-center justify-center bg-white px-4">
-        <div className="bg-white border border-gray-200 shadow-md rounded-2xl p-8 max-w-md w-full text-center">
-          <FaUserCircle className="text-blue-600 text-5xl mx-auto mb-4" />
-          <h2 className="text-xl font-semibold mb-2 text-gray-700">
-            Welcome, <span className="text-blue-700">{loggedInUser}</span>
-          </h2>
-          <p className="text-gray-500 mb-4">You are logged in!</p>
-
-          <div className="flex flex-col gap-4">
-            <button
-              onClick={() => navigate("/change-password")}
-              className="bg-yellow-500 text-white py-2 px-4 rounded-lg hover:bg-yellow-600 transition"
-            >
-              Change Password
-            </button>
-
-            <button
-              onClick={handleLogout}
-              className="inline-flex items-center justify-center gap-2 bg-red-500 text-white py-2 px-4 rounded-lg hover:bg-red-600 transition"
-            >
-              <FaSignOutAlt />
-              Logout
-            </button>
-          </div>
+      showMessage && (
+        <div className="fixed top-4 left-[40%] bg-green-500 text-white px-4 py-2 rounded shadow-lg transition-opacity animate-fade-in-out z-[500000]">
+          ✅ You are already logged in.
         </div>
-      </div>
+      )
     );
   }
 
@@ -166,7 +141,10 @@ const Login = () => {
 
         {isLogin && (
           <div className="text-right text-sm mt-2">
-            <Link to="/forgot-password" className="text-blue-600 hover:underline">
+            <Link
+              to="/forgot-password"
+              className="text-blue-600 hover:underline"
+            >
               Forgot Password?
             </Link>
           </div>

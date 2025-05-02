@@ -57,7 +57,7 @@ const Wishlist = () => {
                   </p>
                 )}
                 <p className="text-blue-600 font-semibold text-base mt-2">
-                  ₹{item.price}
+                  ${item.price}
                 </p>
               </div>
 

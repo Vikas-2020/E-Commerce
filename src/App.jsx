@@ -12,6 +12,9 @@ import Singleproduct from "./pages/Singleproduct";
 import CartProvider from "./context/CartContext";
 import ForgotPassword from "./pages/ForgotPassword";
 import ChangePassword from "./pages/ChangePassword";
+import AuthProvider from "./context/AuthContext";
+import Profile from "./pages/Profile";
+import ProtectedRoute from "./components/ProtectedRoute";
 
 const router = createBrowserRouter([
   {
@@ -32,11 +35,19 @@ const router = createBrowserRouter([
       },
       {
         path: "/wishlist",
-        element: <Wishlist />,
+        element: (
+          <ProtectedRoute>
+            <Wishlist />
+          </ProtectedRoute>
+        ),
       },
       {
         path: "/cart",
-        element: <Cart />,
+        element: (
+          <ProtectedRoute>
+            <Cart />
+          </ProtectedRoute>
+        ),
       },
       {
         path: "/login",
@@ -47,12 +58,20 @@ const router = createBrowserRouter([
         element: <Singleproduct />,
       },
       {
-        path:"/forgot-password",
-        element: <ForgotPassword />
+        path: "/forgot-password",
+        element: <ForgotPassword />,
       },
       {
-        path:"/change-password",
-        element: <ChangePassword />
+        path: "/change-password",
+        element: <ChangePassword />,
+      },
+      {
+        path: "/profile",
+        element: (
+          <ProtectedRoute>
+            <Profile />
+          </ProtectedRoute>
+        ),
       },
       {
         path: "*",
@@ -64,9 +83,11 @@ const router = createBrowserRouter([
 
 function App() {
   return (
-    <CartProvider>
-      <RouterProvider router={router} />
-    </CartProvider>
+    <AuthProvider>
+      <CartProvider>
+        <RouterProvider router={router} />
+      </CartProvider>
+    </AuthProvider>
   );
 }
 

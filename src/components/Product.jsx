@@ -17,7 +17,7 @@ const Product = ({ product }) => {
         <img
           src={image}
           alt={title}
-          className="w-full h-48 object-cover rounded-md mb-3"
+          className="w-full h-48 object-contain rounded-md mb-3"
         />
       </Link>
       <h3 className="text-lg font-semibold mb-2">{truncateText(title, 24)}</h3>
