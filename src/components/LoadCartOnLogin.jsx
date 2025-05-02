@@ -14,7 +14,6 @@ function LoadCartOnLogin() {
       if (!user || hasFetched.current) return;
 
       try {
-        console.log("here");
         // Fetch Cart
         const cartQuery = query(collection(db, "cart"), where("userId", "==", user.uid));
         const cartSnapshot = await getDocs(cartQuery);

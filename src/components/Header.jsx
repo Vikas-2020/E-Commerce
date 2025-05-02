@@ -10,10 +10,12 @@ import {
 import { useCart } from "../context/CartContext";
 import { useAuth } from "../context/AuthContext";
 import { auth } from "../firebase";
+import { getFirestore, doc, getDoc } from "firebase/firestore";
 
 const Header = () => {
   const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
+  const [userName, setUserName] = useState("");
   const { dropdownOpen, setDropdownOpen } = useAuth();
 
   const { cart, wishlist } = useCart();
@@ -23,6 +25,21 @@ const Header = () => {
 
   const wishlistCount = wishlist.length;
   const cartCount = cart.reduce((total, item) => total + item.quantity, 0);
+
+  useEffect(() => {
+    const fetchUserName = async () => {
+      if (user) {
+        const db = getFirestore();
+        const userDoc = doc(db, "users", user.uid);
+        const userSnapshot = await getDoc(userDoc);
+        if (userSnapshot.exists()) {
+          setUserName(userSnapshot.data().name || "User");
+        }
+      }
+    };
+  
+    fetchUserName();
+  }, [user]);
 
   function handleLogOut() {
     auth.signOut();
@@ -123,7 +140,7 @@ const Header = () => {
                 <div className="absolute right-0 mt-2 w-48 bg-white text-gray-800 rounded shadow-lg z-50">
                   <div className="px-4 py-2 border-b">
                     <p className="text-sm font-semibold">
-                      {user.displayName || "User"}
+                      {userName}
                     </p>
                     <p className="text-xs text-gray-500 truncate">
                       {user.email}
