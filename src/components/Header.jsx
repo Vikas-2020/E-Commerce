@@ -6,6 +6,7 @@ import {
   FaUser,
   FaBars,
   FaUserCircle,
+  FaTimes,
 } from "react-icons/fa";
 import { useCart } from "../context/CartContext";
 import { useAuth } from "../context/AuthContext";
@@ -37,7 +38,6 @@ const Header = () => {
         }
       }
     };
-
     fetchUserName();
   }, [user]);
 
@@ -47,7 +47,6 @@ const Header = () => {
     navigate("/login");
   };
 
-  // 👇 Close dropdown on route change or page reload
   useEffect(() => {
     setDropdownOpen(false);
     setMenuOpen(false);
@@ -59,10 +58,10 @@ const Header = () => {
       setMenuOpen(false);
     };
     window.addEventListener("beforeunload", handleBeforeUnload);
-    return () => window.removeEventListener("beforeunload", handleBeforeUnload);
+    return () =>
+      window.removeEventListener("beforeunload", handleBeforeUnload);
   }, []);
 
-  // 👇 Close dropdown and mobile menu when clicking outside
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (
@@ -80,14 +79,20 @@ const Header = () => {
         setMenuOpen(false);
       }
     };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
+
+    document.addEventListener("pointerdown", handleClickOutside);
+    return () => document.removeEventListener("pointerdown", handleClickOutside);
   }, [dropdownOpen, menuOpen]);
 
-  // 👇 Close menu when clicking any nav link
   const handleNavClick = () => {
     setMenuOpen(false);
+    setDropdownOpen(false);
   };
+
+  function handleBarMenu(e) {
+    e.stopPropagation(); // Prevent event from propagating to parent
+    setMenuOpen((prev) => !prev); // Properly toggle the menu state
+  }
 
   return (
     <header className="bg-gray-800 text-white shadow-md sticky top-0 z-50">
@@ -96,18 +101,19 @@ const Header = () => {
           🛍️ E-Commerce
         </Link>
 
+        {/* Menu toggle button with 'X' when open */}
         <button
           className="text-yellow-400 text-xl sm:hidden"
-          onClick={() => setMenuOpen(!menuOpen)}
+          onClick={handleBarMenu}
         >
-          <FaBars />
+          {menuOpen ? <FaTimes /> : <FaBars />}
         </button>
 
         <nav
           ref={menuRef}
           className={`nav-links ${
             menuOpen ? "show" : ""
-          } animate__animated animate__slideInRight flex items-center gap-4`}
+          } animate__animated animate__slideInRight flex items-center gap-4 transition-all duration-300 ease-in-out sm:flex-row sm:gap-6 sm:items-center sm:static sm:block`}
         >
           <Link to="/" onClick={handleNavClick} className="hover:text-yellow-400 transition">
             Home
@@ -200,7 +206,11 @@ const Header = () => {
               )}
             </div>
           ) : (
-            <Link to="/login" onClick={handleNavClick} className="hover:text-yellow-400 transition">
+            <Link
+              to="/login"
+              onClick={handleNavClick}
+              className="hover:text-yellow-400 transition"
+            >
               <FaUser className="text-lg" />
             </Link>
           )}
