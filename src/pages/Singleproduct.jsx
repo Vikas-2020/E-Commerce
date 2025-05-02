@@ -7,7 +7,7 @@ import { useCart } from "../context/CartContext";
 import { useAuth } from "../context/AuthContext";
 
 function Singleproduct() {
-  const { handleAddToCart, addToWishlist, showMessage } = useCart();
+  const { handleAddToCart, addToWishlist } = useCart();
   const { user } = useAuth();
   const { id } = useParams();
   const [product, setProduct] = useState(null);
@@ -81,12 +81,6 @@ function Singleproduct() {
           </button>
         </div>
       </div>
-
-      {showMessage && (
-        <div className="fixed top-4 left-1/2 transform -translate-x-1/2 bg-green-500 text-white px-4 py-2 rounded shadow-lg transition-opacity animate-fade-in-out z-[500000]">
-          ✅ Item already in wishlist.
-        </div>
-      )}
     </div>
   );
 }

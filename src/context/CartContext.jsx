@@ -16,11 +16,16 @@ export function useCart() {
 function CartProvider({ children }) {
   const [cart, setCart] = useState([]);
   const [wishlist, setWishlist] = useState([]);
-  const [showMessage, setShowMessage] = useState(false);
+  const [showMessage, setShowMessage] = useState(null);
   const { user } = useAuth();
 
   const setCartFromDatabase = (items) => setCart(items);
   const setWishListFromDatabase = (items) => setWishlist(items);
+
+  const showTemporaryMessage = (msg) => {
+    setShowMessage(msg);
+    setTimeout(() => setShowMessage(null), 2000);
+  };
 
   // ✅ Add item to cart and Firestore
   const handleAddToCart = (product) => {
@@ -42,6 +47,7 @@ function CartProvider({ children }) {
         : { ...product, quantity: 1 };
 
       addItemToFirestore("cart", user, updatedProduct);
+      showTemporaryMessage("✅ Added to cart.");
       return updatedCart;
     });
   };
@@ -53,6 +59,7 @@ function CartProvider({ children }) {
     setCart((prevCart) => {
       const updatedCart = prevCart.filter((item) => item.id !== productId);
       deleteItemFromFirestore("cart", user, productId);
+      showTemporaryMessage("❌ Removed from cart.");
       return updatedCart;
     });
   };
@@ -64,12 +71,12 @@ function CartProvider({ children }) {
     setWishlist((prev) => {
       const exists = prev.some((item) => item.id === product.id);
       if (exists) {
-        setShowMessage(true);
-        setTimeout(() => setShowMessage(false), 2000);
+        showTemporaryMessage("✅ Item already in wishlist.");
         return prev;
       }
 
       addItemToFirestore("wishlist", user, product);
+      showTemporaryMessage("✅ Added to wishlist.");
       return [...prev, product];
     });
   };
@@ -81,6 +88,7 @@ function CartProvider({ children }) {
     setWishlist((prev) => {
       const updated = prev.filter((item) => item.id !== productId);
       deleteItemFromFirestore("wishlist", user, productId);
+      showTemporaryMessage("❌ Removed from wishlist.");
       return updated;
     });
   };
@@ -102,6 +110,7 @@ function CartProvider({ children }) {
               quantity: product.quantity + 1,
             });
           }
+          showTemporaryMessage("⬆️ Quantity increased.");
           return updated;
         });
         break;
@@ -120,6 +129,7 @@ function CartProvider({ children }) {
           if (product) {
             decreaseItemQuantity("cart", user, product);
           }
+          showTemporaryMessage("⬇️ Quantity decreased.");
           return updated;
         });
         break;
@@ -128,6 +138,7 @@ function CartProvider({ children }) {
         setCart((prevCart) => {
           const updated = prevCart.filter((item) => item.id !== action.id);
           deleteItemFromFirestore("cart", user, action.id);
+          showTemporaryMessage("🗑️ Removed from cart.");
           return updated;
         });
         break;
@@ -135,6 +146,7 @@ function CartProvider({ children }) {
       case "CLEAR_CART":
         setCart([]);
         clearUserCart(user);
+        showTemporaryMessage("🧹 Cart cleared.");
         break;
 
       default:

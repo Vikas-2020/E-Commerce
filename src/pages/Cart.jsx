@@ -4,6 +4,7 @@ import { MdDelete } from "react-icons/md";
 
 function Cart() {
   const { cart, reducer } = useCart();
+  const {showMessage} = useCart();
 
   const totalCost = cart.reduce(
     (sum, item) => sum + item.price * item.quantity,
