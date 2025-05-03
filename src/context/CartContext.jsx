@@ -6,6 +6,8 @@ import {
   decreaseItemQuantity,
   clearUserCart,
 } from "../utils/firebaseUtils";
+import { getFirestore, collection, addDoc, serverTimestamp } from "firebase/firestore";
+
 
 const cartContext = createContext();
 
@@ -14,6 +16,7 @@ export function useCart() {
 }
 
 function CartProvider({ children }) {
+
   const [cart, setCart] = useState([]);
   const [wishlist, setWishlist] = useState([]);
   const [showMessage, setShowMessage] = useState(null);
@@ -25,6 +28,32 @@ function CartProvider({ children }) {
   const showTemporaryMessage = (msg) => {
     setShowMessage(msg);
     setTimeout(() => setShowMessage(null), 2000);
+  };
+
+  //✅ Place order
+
+  const handlePlaceOrder = async () => {
+    if (!user) return;
+  
+    try {
+      const totalCost = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
+
+      const orderData = {
+        items: cart,
+        userId: user.uid,
+        createdAt: serverTimestamp(),
+        total: totalCost,
+      };
+      const db = getFirestore();
+  
+      await addDoc(collection(db, "orders"), orderData);
+  
+      reducer({ type: "CLEAR_CART" });
+      showTemporaryMessage("✅ Order placed successfully!");
+    } catch (error) {
+      console.error("Order placement failed:", error);
+      showTemporaryMessage("❌ Failed to place order.");
+    }
   };
 
   // ✅ Add item to cart and Firestore
@@ -167,6 +196,7 @@ function CartProvider({ children }) {
     setCartFromDatabase,
     setWishListFromDatabase,
     showMessage,
+    handlePlaceOrder,
   };
 
   return <cartContext.Provider value={value}>{children}</cartContext.Provider>;

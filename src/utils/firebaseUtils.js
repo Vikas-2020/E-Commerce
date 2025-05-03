@@ -2,6 +2,11 @@ import { getFirestore, doc, setDoc, deleteDoc, collection, getDocs } from "fireb
 
 const db = getFirestore();
 
+//add placed order to firestore
+export async function placeOrders(orderData, user){
+  
+}
+
 // Add item to cart or wishlist
 export async function addItemToFirestore(collectionName, user, product) {
   const docRef = doc(db, collectionName, `${user.uid}_${product.id}`);

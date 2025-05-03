@@ -1,15 +1,28 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useCart } from "../context/CartContext";
 import { MdDelete } from "react-icons/md";
+import { useAuth } from "../context/AuthContext";
 
 function Cart() {
   const { cart, reducer } = useCart();
-  const {showMessage} = useCart();
+  const { handlePlaceOrder } = useCart();
+  const { user } = useAuth();
+  const navigate = useNavigate();
 
   const totalCost = cart.reduce(
     (sum, item) => sum + item.price * item.quantity,
     0
   );
+
+  function placeOrder() {
+    if (!user) {
+      navigate("/login");
+      return;
+    }
+
+    handlePlaceOrder();
+    navigate("/orders");
+  }
 
   return (
     <div className="p-6 max-w-5xl mx-auto min-h-[73.9vh]">
@@ -102,10 +115,16 @@ function Cart() {
               Total: ${totalCost.toFixed(2)}
             </h3>
             <button
-              className="mt-4 sm:mt-0 bg-red-500 hover:bg-red-600 text-white px-6 py-2 rounded-lg font-semibold transition"
+              className="mt-4 sm:mt-0 bg-red-500 hover:bg-red-600 text-white px-6 py-2 rounded-lg font-semibold transition cursor-pointer"
               onClick={() => reducer({ type: "CLEAR_CART" })}
             >
               Clear Cart
+            </button>
+            <button
+              className="mt-4 sm:mt-0 bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-lg font-semibold transition cursor-pointer"
+              onClick={placeOrder}
+            >
+              Place Order
             </button>
           </div>
         </>

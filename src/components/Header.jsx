@@ -77,6 +77,7 @@ const Header = () => {
         !menuRef.current.contains(e.target)
       ) {
         setMenuOpen(false);
+        console.log("vikas");
       }
     };
 
@@ -90,9 +91,12 @@ const Header = () => {
   };
 
   function handleBarMenu(e) {
-    e.stopPropagation(); // Prevent event from propagating to parent
+    // e.stopPropagation(); // Prevent event from propagating to parent
     setMenuOpen((prev) => !prev); // Properly toggle the menu state
+  
   }
+
+  console.log(menuOpen);
 
   return (
     <header className="bg-gray-800 text-white shadow-md sticky top-0 z-50">

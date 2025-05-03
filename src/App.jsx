@@ -15,6 +15,7 @@ import ChangePassword from "./pages/ChangePassword";
 import AuthProvider from "./context/AuthContext";
 import Profile from "./pages/Profile";
 import ProtectedRoute from "./components/ProtectedRoute";
+import MyOrders from "./pages/MyOrders";
 
 const router = createBrowserRouter([
   {
@@ -55,7 +56,7 @@ const router = createBrowserRouter([
       },
       {
         path: "/products/:id",
-        element: <Singleproduct />,
+        element: <Singleproduct roduct />,
       },
       {
         path: "/forgot-password",
@@ -70,6 +71,14 @@ const router = createBrowserRouter([
         element: (
           <ProtectedRoute>
             <Profile />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "/orders",
+        element: (
+          <ProtectedRoute>
+            <MyOrders />
           </ProtectedRoute>
         ),
       },
