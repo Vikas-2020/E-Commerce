@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { getFirestore, doc, getDoc, setDoc } from "firebase/firestore";
 import { useAuth } from "../context/AuthContext";
+import { Link } from "react-router-dom";
 
 function Profile() {
   const { user } = useAuth();
@@ -176,6 +177,9 @@ function Profile() {
         >
           {isUpdating ? "Updating Profile" : "Update Profile"}
         </button>
+        <Link to="/change-password" className="w-full bg-blue-500 text-white p-2 rounded hover:bg-blue-600">
+          Change Password
+        </Link>
       </form>
     </div>
   );
